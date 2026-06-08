@@ -146,3 +146,40 @@ Coverage: datasources, repository, use cases, BLoC — semua layer di-test denga
 ├── domain/usecases    2 tests
 └── presentation/bloc  4 tests
 ```
+
+---
+
+## Proses Pembuatan
+
+Project ini dibuat sepenuhnya menggunakan **Claude Code** dengan orkestrasi [Superpowers](https://github.com/anthropics/claude-code) melalui alur berikut:
+
+### 1. Brainstorming
+Sesi tanya-jawab iteratif untuk mendefinisikan stack, pola arsitektur, dan keputusan desain (NetworkClient abstraction, single-state BLoC, Hive JSON-string cache, dll).
+
+### 2. Design Spec
+Spesifikasi desain lengkap ditulis ke `docs/superpowers/specs/` mencakup folder structure, layer contracts, package stack, DI strategy, dan testing coverage map.
+
+### 3. Writing Plans
+Implementation plan detail 20 task ditulis ke `docs/superpowers/plans/` — setiap task berisi exact file paths, complete code, dan expected test output. Zero placeholder.
+
+### 4. Subagent-Driven Development (SDD)
+Setiap task dieksekusi oleh **fresh subagent** yang terisolasi, diikuti dua tahap review:
+- **Spec compliance review** — memastikan implementasi sesuai spec
+- **Code quality review** — mendeteksi bug, race condition, dan anti-pattern
+
+```
+Orchestrator
+├── Task 1  → Implementer subagent → Spec reviewer → Quality reviewer ✅
+├── Task 2  → Implementer subagent → Spec reviewer → Quality reviewer ✅
+├── ...
+└── Task 20 → Final verification (20 tests passing, analyzer clean) ✅
+```
+
+Beberapa perbaikan nyata yang ditemukan oleh review loop:
+- JSON decode sebelum status check di `HttpNetworkClient` → fixed
+- `super.onError()` dipanggil setelah logging di `AppBlocObserver` → fixed
+- `bloc_test: ^9.1.7` inkompatibel dengan `bloc: ^9.0.0` → upgrade ke `^10.0.0`
+- `@freezed` class butuh `abstract class` di Freezed v3 → fixed di semua files
+- `android:allowBackup` tidak di-set → added untuk proteksi `flutter_secure_storage`
+
+> Docs lengkap ada di `docs/superpowers/` (spec + plan).

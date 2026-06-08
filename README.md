@@ -1,12 +1,12 @@
 # Flutter Boilerplate
 
-Flutter boilerplate dengan **Clean Architecture**, TMDB API, dan full unit test coverage. Dirancang sebagai template project Flutter yang scalable dan maintainable.
+Flutter boilerplate with **Clean Architecture**, TMDB API integration, and full unit test coverage. Designed as a scalable and maintainable Flutter project template.
 
 ---
 
 ## Tech Stack
 
-| Kategori | Package |
+| Category | Package |
 |---|---|
 | State Management | `flutter_bloc` + `bloc` |
 | Dependency Injection | `get_it` |
@@ -20,21 +20,21 @@ Flutter boilerplate dengan **Clean Architecture**, TMDB API, dan full unit test 
 
 ---
 
-## Arsitektur
+## Architecture
 
-Clean Architecture 3 layer per feature:
+Clean Architecture with 3 layers per feature:
 
 ```
-data       → network (http/dio) + local cache (hive), mapping JSON → model
-domain     → entities, use cases, repository contracts (pure Dart)
+data         → network (http/dio) + local cache (hive), maps JSON → model
+domain       → entities, use cases, repository contracts (pure Dart)
 presentation → BLoC, pages, widgets
 ```
 
-Dependency hanya ke dalam: `presentation → domain ← data`
+Dependencies only point inward: `presentation → domain ← data`
 
 ---
 
-## Struktur Folder
+## Folder Structure
 
 ```
 lib/
@@ -47,7 +47,7 @@ lib/
 │   ├── storage/        # StorageService (flutter_secure_storage)
 │   └── usecase/        # UseCase<Output, Params> base class
 ├── features/
-│   └── movie/          # Contoh feature (TMDB popular movies + detail)
+│   └── movie/          # Example feature (TMDB popular movies + detail)
 │       ├── data/       # Models, datasources, repository impl
 │       ├── di/         # Per-feature GetIt instance
 │       ├── domain/     # Entities, repository contract, use cases
@@ -58,12 +58,12 @@ lib/
 
 ---
 
-## Pattern Utama
+## Key Patterns
 
 ### NetworkClient Abstraction
-Exception handling terpusat — datasource bebas dari try/catch:
-- `HttpNetworkClient` → pakai `http` package
-- `DioNetworkClient` → pakai `dio` + `AuthInterceptor`
+Exception handling is centralized — datasources stay clean:
+- `HttpNetworkClient` → uses `http` package
+- `DioNetworkClient` → uses `dio` + `AuthInterceptor`
 
 ### BLoC — Single State + Status Enum
 ```dart
@@ -79,11 +79,11 @@ class MovieListState with _$MovieListState {
 }
 ```
 
-### Repository — Network-First Cache
+### Repository — Network-First Cache Strategy
 ```
-1. Fetch remote → sukses: cache ke Hive, return Right(data)
-2. Remote gagal → ambil dari Hive cache, return Right(cached)
-3. Keduanya gagal → return Left(Failure)
+1. Fetch remote → success: cache to Hive, return Right(data)
+2. Remote fails → load from Hive cache, return Right(cached)
+3. Both fail    → return Left(Failure)
 ```
 
 ### Dependency Injection — Per Feature
@@ -93,14 +93,14 @@ final movieInjection = GetIt.asNewInstance(); // isolated per feature
 
 ---
 
-## Menambah Feature Baru
+## Adding a New Feature
 
-1. Buat folder `lib/features/<nama_feature>/` dengan subfolder `data/`, `domain/`, `presentation/`, `di/`
-2. Domain: definisikan entity (`@freezed`), repository contract, use cases
-3. Data: buat model (`@freezed` + `fromJson`), datasources (inject `NetworkClient`), repository impl
+1. Create `lib/features/<feature_name>/` with subfolders `data/`, `domain/`, `presentation/`, `di/`
+2. Domain: define entity (`@freezed`), repository contract, use cases
+3. Data: create model (`@freezed` + `fromJson`), datasources (inject `NetworkClient`), repository impl
 4. Presentation: BLoC (freezed single-state), pages, widgets
-5. DI: buat `<feature>_injection.dart` + 4 injection files, daftarkan di `DependencyInjection`
-6. Routing: tambahkan route di `AppRoutes`
+5. DI: create `<feature>_injection.dart` + 4 injection files, register in `DependencyInjection`
+6. Routing: add route in `AppRoutes`
 
 ---
 
@@ -114,8 +114,8 @@ flutter run
 
 ### API Key
 
-Boilerplate menggunakan TMDB API. Token ada di `lib/core/constant/api_endpoint.dart`.
-Untuk production, gunakan `--dart-define`:
+This boilerplate uses the TMDB API. The token is in `lib/core/constant/api_endpoint.dart`.
+For production, use `--dart-define`:
 
 ```bash
 flutter run --dart-define=TMDB_TOKEN=your_token_here
@@ -126,46 +126,46 @@ flutter run --dart-define=TMDB_TOKEN=your_token_here
 ## Testing
 
 ```bash
-# Jalankan semua test
+# Run all tests
 flutter test
 
-# Dengan output detail
+# With detailed output
 flutter test --reporter expanded
 ```
 
-Coverage: datasources, repository, use cases, BLoC — semua layer di-test dengan `mocktail`.
+Coverage: datasources, repository, use cases, BLoC — all layers tested with `mocktail`.
 
 ---
 
-## Hasil Test
+## Test Results
 
 ```
 20 tests — 0 failures
 ├── data/datasources   9 tests
-├── data/repositories  5 tests  
+├── data/repositories  5 tests
 ├── domain/usecases    2 tests
 └── presentation/bloc  4 tests
 ```
 
 ---
 
-## Proses Pembuatan
+## How This Was Built
 
-Project ini dibuat sepenuhnya menggunakan **Claude Code** dengan orkestrasi [Superpowers](https://github.com/anthropics/claude-code) melalui alur berikut:
+This project was built entirely using **Claude Code** with [Superpowers](https://github.com/anthropics/claude-code) orchestration through the following workflow:
 
 ### 1. Brainstorming
-Sesi tanya-jawab iteratif untuk mendefinisikan stack, pola arsitektur, dan keputusan desain (NetworkClient abstraction, single-state BLoC, Hive JSON-string cache, dll).
+Iterative Q&A sessions to define the stack, architecture patterns, and design decisions (NetworkClient abstraction, single-state BLoC, Hive JSON-string cache, etc.).
 
 ### 2. Design Spec
-Spesifikasi desain lengkap ditulis ke `docs/superpowers/specs/` mencakup folder structure, layer contracts, package stack, DI strategy, dan testing coverage map.
+Full design specification written to `docs/superpowers/specs/` covering folder structure, layer contracts, package stack, DI strategy, and testing coverage map.
 
 ### 3. Writing Plans
-Implementation plan detail 20 task ditulis ke `docs/superpowers/plans/` — setiap task berisi exact file paths, complete code, dan expected test output. Zero placeholder.
+Detailed 20-task implementation plan written to `docs/superpowers/plans/` — each task contains exact file paths, complete code, and expected test output. Zero placeholders.
 
 ### 4. Subagent-Driven Development (SDD)
-Setiap task dieksekusi oleh **fresh subagent** yang terisolasi, diikuti dua tahap review:
-- **Spec compliance review** — memastikan implementasi sesuai spec
-- **Code quality review** — mendeteksi bug, race condition, dan anti-pattern
+Each task was executed by a **fresh isolated subagent**, followed by a two-stage review loop:
+- **Spec compliance review** — verifies implementation matches the spec
+- **Code quality review** — detects bugs, race conditions, and anti-patterns
 
 ```
 Orchestrator
@@ -175,11 +175,11 @@ Orchestrator
 └── Task 20 → Final verification (20 tests passing, analyzer clean) ✅
 ```
 
-Beberapa perbaikan nyata yang ditemukan oleh review loop:
-- JSON decode sebelum status check di `HttpNetworkClient` → fixed
-- `super.onError()` dipanggil setelah logging di `AppBlocObserver` → fixed
-- `bloc_test: ^9.1.7` inkompatibel dengan `bloc: ^9.0.0` → upgrade ke `^10.0.0`
-- `@freezed` class butuh `abstract class` di Freezed v3 → fixed di semua files
-- `android:allowBackup` tidak di-set → added untuk proteksi `flutter_secure_storage`
+Real issues caught by the review loop:
+- JSON decode before status check in `HttpNetworkClient` → fixed
+- `super.onError()` called after logging in `AppBlocObserver` → fixed
+- `bloc_test: ^9.1.7` incompatible with `bloc: ^9.0.0` → upgraded to `^10.0.0`
+- `@freezed` classes require `abstract class` in Freezed v3 → fixed across all files
+- `android:allowBackup` not set → added to protect `flutter_secure_storage` keys
 
-> Docs lengkap ada di `docs/superpowers/` (spec + plan).
+> Full docs available in `docs/superpowers/` (spec + plan).

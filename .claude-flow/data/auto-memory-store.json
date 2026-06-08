@@ -1,0 +1,14 @@
+[
+  {
+    "id": "task-task-1-add-dependencies",
+    "key": "task-1-add-dependencies",
+    "content": "Task completed: task-1-add-dependencies",
+    "namespace": "tasks",
+    "type": "task-outcome",
+    "metadata": {
+      "success": true,
+      "quality": 0.85
+    },
+    "createdAt": 1780929281702
+  }
+]

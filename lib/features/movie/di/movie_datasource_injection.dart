@@ -1,4 +1,6 @@
+import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../../../core/network/dio_network_client.dart';
@@ -15,9 +17,15 @@ class MovieDatasourceInjection {
     final movieBox = await Hive.openBox<String>(StorageKeys.movieBox);
 
     movieInjection
-      ..registerLazySingleton<Dio>(() => buildDio())
+      ..registerLazySingleton<Dio>(
+        () => buildDio(
+          extraInterceptors: kDebugMode ? [ChuckerDioInterceptor()] : [],
+        ),
+      )
       ..registerLazySingleton<NetworkClient>(
-        () => HttpNetworkClient(client: http.Client()),
+        () => HttpNetworkClient(
+          client: kDebugMode ? ChuckerHttpClient(http.Client()) : http.Client(),
+        ),
         instanceName: 'http',
       )
       ..registerLazySingleton<NetworkClient>(

@@ -1,5 +1,6 @@
 import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/debug/debug_screen.dart';
 import '../../features/movie/presentation/pages/movie_detail_page.dart';
@@ -10,7 +11,7 @@ class AppRoutes {
   AppRoutes._();
 
   static final GoRouter router = GoRouter(
-    navigatorKey: ChuckerFlutter.navigatorKey,
+    navigatorKey: kDebugMode ? ChuckerFlutter.navigatorKey : GlobalKey<NavigatorState>(),
     initialLocation: AppNameRoutes.movieList,
     routes: [
       GoRoute(

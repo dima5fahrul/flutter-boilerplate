@@ -27,9 +27,7 @@ void main() {
 
     test('no extra interceptors when list is empty', () {
       final dio = buildDio();
-      final chucker = ChuckerDioInterceptor();
-      final dioWithChucker = buildDio(extraInterceptors: [chucker]);
-      expect(dioWithChucker.interceptors.length, greaterThan(dio.interceptors.length));
+      expect(dio.interceptors.whereType<ChuckerDioInterceptor>().isEmpty, isTrue);
     });
   });
 }

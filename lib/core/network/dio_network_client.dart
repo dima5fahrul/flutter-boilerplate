@@ -61,7 +61,7 @@ class DioNetworkClient implements NetworkClient {
   }
 }
 
-Dio buildDio() {
+Dio buildDio({List<Interceptor> extraInterceptors = const []}) {
   final dio = Dio(
     BaseOptions(
       baseUrl: ApiEndpoint.baseUrl,
@@ -71,5 +71,6 @@ Dio buildDio() {
     ),
   );
   dio.interceptors.add(AuthInterceptor());
+  dio.interceptors.addAll(extraInterceptors);
   return dio;
 }

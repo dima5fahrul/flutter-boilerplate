@@ -1,3 +1,7 @@
+# Project-specific
+docs/
+.claude-flow/
+
 # Miscellaneous
 *.class
 *.log
